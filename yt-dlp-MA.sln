@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34601.278
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "yt-dlp-MA", "yt-dlp-MA.csproj", "{0E4C5482-200C-4583-958B-970FABDB3C8D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0E4C5482-200C-4583-958B-970FABDB3C8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E4C5482-200C-4583-958B-970FABDB3C8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E4C5482-200C-4583-958B-970FABDB3C8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E4C5482-200C-4583-958B-970FABDB3C8D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {27974BAA-E8EC-41AB-95E6-A68DE40CBDF3}
+	EndGlobalSection
+EndGlobal
