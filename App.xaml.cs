@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows;
 
-namespace yt_dlp_MA
+namespace Views
 {
     /// <summary>
     /// Interaction logic for App.xaml

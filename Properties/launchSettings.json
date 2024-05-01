@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "yt-dlp-MA": {
+      "commandName": "Project",
+      "workingDirectory": "C:\\Users\\Viktor\\Škola\\BPC-OOP\\PROJEKT\\yt-dlp-MA"
+    }
+  }
+}
