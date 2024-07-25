@@ -45,11 +45,21 @@ namespace ytdlpMA.Commands
                 else
                     _videoViewModel.Duration = TimeSpan.Zero;
 
-                byte[] thumbnailBytes = [];
-                using (HttpClient httpClient = new())
-                    thumbnailBytes = await httpClient.GetByteArrayAsync(video.Thumbnails.GetWithHighestResolution().Url);
+                if (video.Thumbnails.GetWithHighestResolution().Url.Contains("webp"))
+                {
+                    _videoViewModel.ErrorSnackbarMessageQueue.Enqueue(".webp thumbnails are not supported.");
+                    _videoViewModel.Thumbnail = Classes.Utilities.CreateBlankImage(4, 4);
+                }
+                else
+                {
+                    byte[] thumbnailBytes = [];
+
+                    using (HttpClient httpClient = new())
+                        thumbnailBytes = await httpClient.GetByteArrayAsync(video.Thumbnails.GetWithHighestResolution().Url);
 
                     _videoViewModel.Thumbnail = Classes.Utilities.ByteArrayToBitmapImage(thumbnailBytes);
+                }
+
                 _videoViewModel.QueuedUrl = _videoViewModel.Url;
             }
             catch
