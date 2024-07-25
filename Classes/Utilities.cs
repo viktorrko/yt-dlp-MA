@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Windows.Media.Imaging;
 using System.Text.RegularExpressions;
-using ytdlpMA.Classes;
 using System.Windows.Media;
 
 namespace ytdlpMA.Classes

@@ -11,6 +11,9 @@
     <Configurations>Debug;Release;My Release</Configurations>
     <Platforms>AnyCPU;x64</Platforms>
     <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
+    <FileVersion>2.0</FileVersion>
+	<InformationalVersion>2.0-release</InformationalVersion>
+	<AssemblyInformationalVersion>2.0</AssemblyInformationalVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -42,10 +45,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.68.0.3421" />
     <PackageReference Include="Iso8601Duration" Version="1.0.0" />
     <PackageReference Include="MaterialDesignThemes" Version="5.0.0" />
     <PackageReference Include="WindowsAPICodePack" Version="8.0.4" />
+    <PackageReference Include="YoutubeExplode" Version="6.3.16" />
   </ItemGroup>
 
   <ItemGroup>

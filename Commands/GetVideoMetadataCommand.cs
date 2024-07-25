@@ -1,10 +1,9 @@
-﻿using ytdlpMA.Classes;
-using Google.Apis.YouTube.v3.Data;
-using ytdlpMA.Models;
+﻿using YoutubeExplode;
 using System.ComponentModel;
-using System.Security.Policy;
 using System.Windows;
 using ytdlpMA.ViewModels;
+using YoutubeExplode.Common;
+using System.Net.Http;
 
 namespace ytdlpMA.Commands
 {
@@ -32,19 +31,28 @@ namespace ytdlpMA.Commands
             _videoViewModel.LoadingBarVisible = Visibility.Visible;
             _videoViewModel.ThumbnailOpacity = 0.5f;
             string newId = Classes.Utilities.ExtractYouTubeVideoId(_videoViewModel.Url);
-            
 
-            if (await YouTubeAPI.Instance.IsValidVideoAsync(newId))
+            var youtube = new YoutubeClient();
+            try
             {
-                await YouTubeAPI.Instance.RetrieveVideoAsync(newId);
-                _videoViewModel.Id = newId;
-                _videoViewModel.Title = YouTubeAPI.Instance.GetTitle();
-                _videoViewModel.Channel = YouTubeAPI.Instance.GetChannel();
-                _videoViewModel.Duration = YouTubeAPI.Instance.GetDuration();
-                _videoViewModel.Thumbnail = await YouTubeAPI.Instance.GetThumbnailAsync();
+                var video = await youtube.Videos.GetAsync(newId);
+                //_videoViewModel.Id = newId; 
+                // TODO: check if i need Id parameter
+                _videoViewModel.Title = video.Title;
+                _videoViewModel.Channel = video.Author.ChannelTitle;
+                if (video.Duration != null)
+                    _videoViewModel.Duration = video.Duration.Value;
+                else
+                    _videoViewModel.Duration = TimeSpan.Zero;
+
+                byte[] thumbnailBytes = [];
+                using (HttpClient httpClient = new())
+                    thumbnailBytes = await httpClient.GetByteArrayAsync(video.Thumbnails.GetWithHighestResolution().Url);
+
+                    _videoViewModel.Thumbnail = Classes.Utilities.ByteArrayToBitmapImage(thumbnailBytes);
                 _videoViewModel.QueuedUrl = _videoViewModel.Url;
             }
-            else
+            catch
             {
                 _videoViewModel.Title = "Title";
                 _videoViewModel.Channel = "Channel";

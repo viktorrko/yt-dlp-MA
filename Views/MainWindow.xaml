@@ -57,14 +57,9 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-
-                        <ToggleButton Grid.Row="0"
-                                      Grid.Column="1"
-                                      VerticalAlignment="Center"
-                                      HorizontalAlignment="Right"
-                                      Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                                      IsChecked="{Binding ShowConsole, Mode=TwoWay}"/>
 
                         <TextBlock Grid.Row="0"
                                    Grid.Column="0"
@@ -72,8 +67,30 @@
                                    Margin="6,12"
                                    Text="Show Console"
                                    Style="{StaticResource MaterialDesignBody2TextBlock}" />
+                        
+                        <ToggleButton Grid.Row="0"
+                                      Grid.Column="1"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Right"
+                                      Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                      IsChecked="{Binding ShowConsole, Mode=TwoWay}"/>
 
-                        <TextBox Grid.Row="1"
+                        <TextBlock Grid.Row="1"
+                                   Grid.Column="0"
+                                   VerticalAlignment="Center"
+                                   Margin="6,12,6,6"
+                                   Text="Console Height"
+                                   Style="{StaticResource MaterialDesignBody2TextBlock}" />
+
+                        <Slider Grid.Row="2"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="2"
+                                Margin="0,0,0,12"
+                                Maximum="250"
+                                Minimum="100"
+                                Value="{Binding ConsoleHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBox Grid.Row="3"
                                  Grid.Column ="0"
                                  Grid.ColumnSpan="2"
                                  Margin="0,12,0,0"
@@ -374,7 +391,8 @@
                                      FontWeight="Regular"
                                      Text="{Binding Video.ConsoleText, UpdateSourceTrigger=PropertyChanged}"
                                      Visibility="{Binding ShowConsole, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                     TextChanged="ConsoleTextBox_TextChanged" Height="150"/>
+                                     TextChanged="ConsoleTextBox_TextChanged"
+                                     Height="{Binding ConsoleHeight, UpdateSourceTrigger=PropertyChanged}"/>
 
                             <ProgressBar x:Name="DownloadProgressBar"
                                          Grid.Row="1"

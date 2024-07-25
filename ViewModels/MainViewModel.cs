@@ -1,17 +1,4 @@
-﻿using ytdlpMA.Commands;
-using ytdlpMA.Models;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-
-namespace ytdlpMA.ViewModels
+﻿namespace ytdlpMA.ViewModels
 {
     internal class MainViewModel : ViewModelBase
     {
@@ -39,6 +26,20 @@ namespace ytdlpMA.ViewModels
                 {
                     _showConsole = value;
                     OnPropertyChanged(nameof(ShowConsole));
+                }
+            }
+        }
+
+        private int _consoleHeight = 150;
+        public int ConsoleHeight
+        {
+            get => _consoleHeight;
+            set
+            {
+                if (_consoleHeight != value)
+                {
+                    _consoleHeight = value;
+                    OnPropertyChanged(nameof(ConsoleHeight));
                 }
             }
         }
