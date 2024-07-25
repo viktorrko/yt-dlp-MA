@@ -1,4 +1,4 @@
-﻿using Classes;
+﻿using ytdlpMA.Classes;
 using MaterialDesignThemes.Wpf;
 using System.Diagnostics;
 using System.IO;
@@ -11,9 +11,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using Utilities;
+using ytdlpMA.ViewModels;
+using MaterialDesignColors.Recommended;
 
-namespace Views
+namespace ytdlpMA.Views
 {
     
     /// <summary>
@@ -21,13 +22,11 @@ namespace Views
     /// </summary>
     public partial class MainWindow : Window
     {
-        readonly VideoItem videoItem = new VideoItem();
-        readonly DownloadItem downloadItem = new DownloadItem();
-
         public MainWindow()
         {
             InitializeComponent();
-            DestinationTextBox.Text = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            DataContext = new MainViewModel();
+            FFmpegCheck();
         }
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -35,126 +34,56 @@ namespace Views
             DragMove();
         }
 
-        private async void UrlReloadButton_ClickAsync(object sender, RoutedEventArgs e)
+        private void ConsoleTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            ThumbnailLoadingProgressBar.Visibility = Visibility.Visible;
-            ThumbnailBorder.Background.Opacity = 0.5;
-
-            if (await Utils.IsValidYouTubeUrlAsync(LinkTextBox.Text))
-            {
-                await videoItem.UpdateUrlAsync(LinkTextBox.Text);
-                downloadItem.Url = LinkTextBox.Text;
-                TitleTextBlock.Text = videoItem.Title;
-                ChannelTextBlock.Text = videoItem.Channel;
-                DurationTextBlock.Text = videoItem.Duration.ToString();
-                ThumbnailBorder.Background = new ImageBrush { ImageSource = Utils.ByteArrayToBitmapImage(videoItem.ThumbnailData), Stretch = Stretch.UniformToFill };
-            }
-            else
-                ErrorSnackbar.MessageQueue.Enqueue("Invalid link.");
-
-            ThumbnailLoadingProgressBar.Visibility = Visibility.Hidden;
-            ThumbnailBorder.Background.Opacity = 1;
+            ConsoleTextBox.ScrollToEnd();
         }
 
-        private void BrowseFolderButton_Click(object sender, RoutedEventArgs e)
+        private void FFmpegCheck()
         {
-            string newDestination = DownloadItem.SetDestinationPath();
-            if (newDestination != String.Empty)
-            {
-                DestinationTextBox.Text = newDestination;
-            }
-        }
-
-        private void DownloadButton_Click(object sender, RoutedEventArgs e)
-        {
-            OutputTextBox.Text = String.Empty;
-            DownloadProgressBar.IsIndeterminate = true;
-            DownloadProgressBar.Value = 0;
-
-            downloadItem.Extension = ((ComboBoxItem)ExtensionComboBox.SelectedItem).Content.ToString();
-            
-            downloadItem.DestinationPath = DestinationTextBox.Text;
-            downloadItem.CustomArguments = CustomArgumentsTextBox.Text;
-            downloadItem.Switches["convert"] = ConvertChip.IsSelected;
-            downloadItem.Switches["mtime"] = LastModifiedChip.IsSelected;
-            downloadItem.Switches["thumbnail"] = EmbedThumbnailChip.IsSelected;
-            downloadItem.Switches["metadata"] = EmbedMetadataChip.IsSelected;
-
             ProcessStartInfo startInfo = new()
             {
-                FileName = Path.GetFullPath(DownloadItem.ytdlp),
+                FileName = "ffmpeg",
+                Arguments = "-h",
                 UseShellExecute = false,
                 CreateNoWindow = true,
-                WindowStyle = ProcessWindowStyle.Hidden,
                 RedirectStandardOutput = true,
-                Arguments = String.Join(" ", downloadItem.ArgumentsListBuilder()),
-
             };
 
-            OutputTextBox.AppendText("yt-dlp " + startInfo.Arguments + Environment.NewLine + Environment.NewLine);
-            
-            Process process = new Process();
-            process.StartInfo = startInfo;
-            process.EnableRaisingEvents = true;
-            process.OutputDataReceived += new DataReceivedEventHandler(ProcessOutputHandler);
-            process.Exited += new EventHandler(ProcessExitHandler);
-            process.Start();
-            process.BeginOutputReadLine();
-        }
-
-        private void ProcessOutputHandler(object sender, DataReceivedEventArgs line)
-        {
-            Dispatcher.Invoke(() =>
+            using (Process process = new Process())
             {
-                LinkTab.IsEnabled = false;
-                SettingsTab.IsEnabled = false;
-                DownloadButtonsStackPanel.IsEnabled = false;
-                OutputTextBox.BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(51, 153, 255));
-                
-                OutputTextBox.AppendText(line.Data + Environment.NewLine);
-                OutputTextBox.ScrollToEnd();
+                process.StartInfo = startInfo;
 
-                if (line.Data != null)
+                try
                 {
-                    if (line.Data.StartsWith("[download]"))
+                    process.Start();
+                    process.WaitForExit();
+
+                    if (process.ExitCode == 0)
                     {
-                        DownloadProgressBar.IsIndeterminate = false;
-                        DownloadProgressBar.Value = Utils.ParseDownloadProgress(line.Data);
+                        FFmpegCheckButton.Background = Brushes.Green;
+                        FFmpegCheckButton.Content = new PackIcon { Kind = PackIconKind.Check, Foreground = Brushes.White, Width=24, Height=24 };
+                        Console.WriteLine("FFmpeg found.");
                     }
-                    else
-                    {
-                        DownloadProgressBar.IsIndeterminate = true;
-                        DownloadProgressBar.Value = 0;
-                    }  
                 }
-            });
-        }
-
-        private void ProcessExitHandler(object sender, EventArgs e)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                DownloadProgressBar.Value = 0;
-                DownloadProgressBar.IsIndeterminate = false;
-                OutputTextBox.BorderBrush = null;
-
-                LinkTab.IsEnabled = true;
-                SettingsTab.IsEnabled = true;
-                DownloadButtonsStackPanel.IsEnabled = true;
-
-                OutputTextBox.AppendText("[PROCESS ENDED]" + Environment.NewLine);
-            });
-        }
-
-        private void OpenDownloadFolderButton_Click(object sender, EventArgs e)
-        {
-            if (downloadItem.DestinationPath != String.Empty)
-                Process.Start("explorer.exe", downloadItem.DestinationPath);
+                catch (Exception ex)
+                {
+                    Console.WriteLine("An error occurred while executing the process: " + ex.Message);
+                    Console.WriteLine("FFmpeg not found.");
+                }
+            }
         }
 
         private void CloseButton_Click(Object sender, EventArgs e)
         {
             Application.Current.Shutdown();
         }
+
+        private void ToggleDrawer_Click(object sender, RoutedEventArgs e)
+        {
+            DrawerHost.IsRightDrawerOpen = !DrawerHost.IsRightDrawerOpen;
+        }
+
+        
     }
 }

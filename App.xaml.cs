@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows;
 
-namespace Views
+namespace ytdlpMA
 {
     /// <summary>
     /// Interaction logic for App.xaml

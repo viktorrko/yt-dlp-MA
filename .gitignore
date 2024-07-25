@@ -363,5 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # exe binaries
-ffmpeg.exe
-yt-dlp.exe
+Resources/exe/ffmpeg.exe
+Resources/exe/yt-dlp.exe

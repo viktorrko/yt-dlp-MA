@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 using System.Windows.Media.Imaging;
 using System.Text.RegularExpressions;
-using Classes;
+using ytdlpMA.Classes;
+using System.Windows.Media;
 
-namespace Utilities
+namespace ytdlpMA.Classes
 {
-    class Utils
+    class Utilities
     {
         public static bool IsValidUrl(string url)
         {
@@ -29,7 +25,7 @@ namespace Utilities
             }
             else if (url.Contains("youtu.be/"))
             {
-                return url.Split(new[] { "youtu.be/" }, StringSplitOptions.RemoveEmptyEntries)[1].Split('&')[0];
+                return url.Split(new[] { "youtu.be/" }, StringSplitOptions.RemoveEmptyEntries)[1].Split('?')[0];
             }
             else
             {
@@ -37,25 +33,10 @@ namespace Utilities
             }
         }
 
-        public static async Task<bool> IsValidYouTubeUrlAsync(string url)
-        {
-            if (IsValidUrl(url))
-            {
-                string Id = ExtractYouTubeVideoId(url);
-                if (Id != String.Empty)
-                {
-                    if (await YouTubeAPIHandler.IsValidVideoAsync(Id))
-                        return true;
-                }
-            }
-            
-            return false;
-        }
-
         public static BitmapImage ByteArrayToBitmapImage(byte[] imageData)
         {
-            BitmapImage bitmapImage = new BitmapImage();
-            using (MemoryStream memoryStream = new MemoryStream(imageData))
+            BitmapImage bitmapImage = new();
+            using (MemoryStream memoryStream = new(imageData))
             {
                 bitmapImage.BeginInit();
                 bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
@@ -63,6 +44,26 @@ namespace Utilities
                 bitmapImage.EndInit();
             }
             return bitmapImage;
+        }
+
+        public static ImageSource CreateBlankImage(int width, int height)
+        {
+            int stride = width * 4;
+            byte[] pixels = new byte[height * stride];
+
+            // Fill the array with black pixels (ARGB format)
+            for (int i = 0; i < pixels.Length; i += 4)
+            {
+                pixels[i] = 0;   // Blue
+                pixels[i + 1] = 0; // Green
+                pixels[i + 2] = 0; // Red
+                pixels[i + 3] = 255; // Alpha
+            }
+
+            BitmapSource bitmapSource = BitmapSource.Create(
+                width, height, 96, 96, PixelFormats.Bgra32, null, pixels, stride);
+
+            return bitmapSource;
         }
 
         public static int ParseDownloadProgress(string line)

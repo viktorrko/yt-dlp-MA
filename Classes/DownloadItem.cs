@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
-namespace Classes
+namespace ytdlpMA.Classes
 {
     class DownloadItem
     {
@@ -72,7 +72,7 @@ namespace Classes
 
         public static string SetDestinationPath()
         {
-            using (CommonOpenFileDialog dialog = new CommonOpenFileDialog())
+            using (CommonOpenFileDialog dialog = new())
             {
                 dialog.IsFolderPicker = true;
                 dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);

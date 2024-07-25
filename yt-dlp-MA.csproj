@@ -3,27 +3,57 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>ytdlpMA</RootNamespace>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>False</UseWindowsForms>
+    <Configurations>Debug;Release;My Release</Configurations>
+    <Platforms>AnyCPU;x64</Platforms>
+    <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;NU1701</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <NoWarn>1701;1702;NU1701</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702;NU1701</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <NoWarn>1701;1702;NU1701</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='My Release|AnyCPU'">
+    <NoWarn>1701;1702;NU1701</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='My Release|x64'">
+    <NoWarn>1701;1702;NU1701</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.68.0.3394" />
-    <PackageReference Include="MaterialDesignThemes" Version="5.0.0" />
-    <PackageReference Include="WindowsAPICodePack" Version="7.0.4" />
+    <Content Include="Resources\icon.ico" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
-    <Folder Include="Resources\" />
+    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.68.0.3421" />
+    <PackageReference Include="Iso8601Duration" Version="1.0.0" />
+    <PackageReference Include="MaterialDesignThemes" Version="5.0.0" />
+    <PackageReference Include="WindowsAPICodePack" Version="8.0.4" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
+    </None>
+    <None Update="Resources\exe\yt-dlp.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
