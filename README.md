@@ -14,13 +14,22 @@ A small utility for downloading audio files from YouTube using yt-dlp.
 + Console view for advanced users.
 
 ### How to use
-+ Paste the link into the URL bar, and press the 'Retrieve' button next to the URL bar.
++ Paste the link into the URL bar, and press the *'Retrieve'* button next to the URL bar.
 + If the video link is valid, the app will retrieve the video metadata.
 + Configure your download options.
-+ Press the 'DOWNLOAD' button to start the download process.
++ Press the *'DOWNLOAD'* button to start the download process.
 
-### Notes
+### Requirements
++ .NET Runtime 8.0+
++ FFmpeg (optional)
+
+### FFmpeg note
 It is recommended that you have FFmpeg installed in your system PATH. Otherwise functions such as converting or embedding metadata won't work. You can check if FFmpeg is recognized and available by clicking on the settings button and looking at the bottom section. If FFmpeg is available, there will be a green checkmark.
+
+### How to build
++ Clone the GitHub repository
++ Place your yt-dlp.exe executable into /Resources/exe folder.
++ Build project.
 
 ### Screenshots
 <img src="https://github.com/user-attachments/assets/adc9e204-675c-462a-98b0-2e6b3ee0c36f" alt="screenshots" height="600" />
