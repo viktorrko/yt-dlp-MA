@@ -1,4 +1,4 @@
-﻿using ytdlpMA.Classes;
+﻿using ytdlpMA.Utilities;
 using ytdlpMA.Commands;
 using MaterialDesignThemes.Wpf;
 using ytdlpMA.Models;
@@ -15,6 +15,7 @@ namespace ytdlpMA.ViewModels
 {
     class VideoViewModel : ViewModelBase , INotifyDataErrorInfo
     {
+        protected internal readonly MainViewModel _mainViewModel;
         public readonly Video _video = new();
 
         // URL BINDING
@@ -49,19 +50,6 @@ namespace ytdlpMA.ViewModels
         }
 
         // METADATA BINDINGS
-        public string Id
-        {
-            get => _video.Id;
-            set
-            {
-                if (_video.Id != value)
-                {
-                    _video.Id = value;
-                    OnPropertyChanged(nameof(Id));
-                }
-            }
-        }
-
         public string Title
         {
             get => _video.Title;
@@ -191,7 +179,7 @@ namespace ytdlpMA.ViewModels
         public ObservableCollection<DownloadToggleOption> DownloadToggleOptions => new(_video.DownloadToggleOptions);
 
         // DOWNLOAD PROGRESS OPTIONS
-        
+
         // download progress bar value
         private int _downloadProgressBarValue;
         public int DownloadProgressBarValue
@@ -245,7 +233,7 @@ namespace ytdlpMA.ViewModels
         public IEnumerable GetErrors(string? propertyName)
         {
             if (string.IsNullOrEmpty(propertyName) || !_errors.ContainsKey(propertyName))
-                return null;
+                return new Dictionary<string, List<string>>();
 
             return _errors[propertyName];
         }
@@ -296,24 +284,22 @@ namespace ytdlpMA.ViewModels
         }
 
         // ERROR SNACKBAR QUEUE
-        private SnackbarMessageQueue _errorSnackbarMessageQueue = new();
         public SnackbarMessageQueue ErrorSnackbarMessageQueue
         {
-            get => _errorSnackbarMessageQueue;
+            get => _mainViewModel.ErrorSnackbarMessageQueue;
             set
             {
-                _errorSnackbarMessageQueue = value;
+                _mainViewModel.ErrorSnackbarMessageQueue = value;
                 OnPropertyChanged(nameof(SnackbarMessageQueue));
             }
         }
 
-        private SnackbarMessageQueue _successSnackbarMessageQueue = new();
         public SnackbarMessageQueue SuccessSnackbarMessageQueue
         {
-            get => _successSnackbarMessageQueue;
+            get => _mainViewModel.SuccessSnackbarMessageQueue;
             set
             {
-                _successSnackbarMessageQueue = value;
+                _mainViewModel.SuccessSnackbarMessageQueue = value;
                 OnPropertyChanged(nameof(SnackbarMessageQueue));
             }
         }
@@ -337,7 +323,7 @@ namespace ytdlpMA.ViewModels
         public ICommand StartDownload { get; }
 
         // CONSTRUCTOR
-        public VideoViewModel()
+        public VideoViewModel(MainViewModel mainViewModel)
         {
             // commands
             GetVideoMetadata = new GetVideoMetadataCommand(this);
@@ -350,6 +336,11 @@ namespace ytdlpMA.ViewModels
             DownloadProgressBarValue = 0;
             DownloadProgressBarIndeterminate = false;
             _consoleText = string.Empty;
+
+            // mainviewmodel
+            _mainViewModel = mainViewModel;
         }
+
+        
     }
 }

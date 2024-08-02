@@ -15,6 +15,10 @@
             </ResourceDictionary.MergedDictionaries>
 
             <utilities:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <utilities:FFmpegToBackgroundConverter x:Key="FFmpegToBackgroundConverter"/>
+            <utilities:FFmpegToIconConverter x:Key="FFmpegToIconConverter"/>
+            <utilities:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+            <utilities:ConvertFormatIsEnabledConverter x:Key="ConvertFormatIsEnabledConverter"/>
         </ResourceDictionary>
 
         

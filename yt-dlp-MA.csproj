@@ -46,6 +46,7 @@
 
   <ItemGroup>
     <PackageReference Include="MaterialDesignThemes" Version="5.0.0" />
+    <PackageReference Include="WebP_Net" Version="1.1.1" />
     <PackageReference Include="WindowsAPICodePack" Version="8.0.4" />
     <PackageReference Include="YoutubeExplode" Version="6.3.16" />
   </ItemGroup>

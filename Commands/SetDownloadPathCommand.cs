@@ -7,14 +7,6 @@ namespace ytdlpMA.Commands
     {
         private readonly VideoViewModel _videoViewModel;
 
-        /*private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(VideoViewModel.FileDownloadPath))
-            {
-                OnCanExecuteChanged();
-            }
-        }*/
-
         public override void Execute(object? parameter)
         {
             using (CommonOpenFileDialog dialog = new())
@@ -24,15 +16,12 @@ namespace ytdlpMA.Commands
 
                 if (dialog.ShowDialog() == CommonFileDialogResult.Ok && dialog.FileName != null)
                     _videoViewModel.FileDownloadPath = dialog.FileName;
-                else
-                    _videoViewModel.FileDownloadPath = String.Empty;
             }
         }
 
         public SetDownloadPathCommand(VideoViewModel videoViewModel)
         {
             _videoViewModel = videoViewModel;
-            // _videoViewModel.PropertyChanged += OnViewModelPropertyChanged;
         }
     }
 }

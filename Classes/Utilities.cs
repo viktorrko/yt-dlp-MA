@@ -1,15 +1,17 @@
-﻿using System.IO;
-using System.Windows.Media.Imaging;
+﻿using System.Diagnostics;
+using System.Drawing;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
-namespace ytdlpMA.Classes
+namespace ytdlpMA.Utilities
 {
     class Utilities
     {
         public static bool IsValidUrl(string url)
         {
-            if (Uri.TryCreate(url, UriKind.Absolute, result: out Uri resultUri) && resultUri.Scheme == Uri.UriSchemeHttps)
+            if (Uri.TryCreate(url, UriKind.Absolute, result: out Uri? resultUri) && resultUri.Scheme == Uri.UriSchemeHttps)
                 return true;
             
             return false;
@@ -40,6 +42,24 @@ namespace ytdlpMA.Classes
                 bitmapImage.BeginInit();
                 bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
                 bitmapImage.StreamSource = memoryStream;
+                bitmapImage.EndInit();
+            }
+            return bitmapImage;
+        }
+
+        public static BitmapImage ImageToBitmapImage(Image image)
+        {
+            Bitmap bitmap = (Bitmap)image;
+            BitmapImage bitmapImage = new BitmapImage();
+            using (MemoryStream memStream = new MemoryStream())
+            {
+                bitmap.Save(memStream, System.Drawing.Imaging.ImageFormat.Png);
+                memStream.Position = 0;
+
+                bitmapImage.BeginInit();
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.UriSource = null;
+                bitmapImage.StreamSource = memStream;
                 bitmapImage.EndInit();
             }
             return bitmapImage;
@@ -82,6 +102,38 @@ namespace ytdlpMA.Classes
             else
             {
                 return 0;
+            }
+        }
+
+        public static async Task<bool> IsFFmpegInstalled()
+        {
+            ProcessStartInfo startInfo = new()
+            {
+                FileName = "ffmpeg",
+                Arguments = "-h",
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+            };
+
+            using (Process process = new Process())
+            {
+                process.StartInfo = startInfo;
+
+                try
+                {
+                    process.Start();
+                    await process.WaitForExitAsync();
+
+                    if (process.ExitCode == 0)
+                        return true;
+                    else
+                        return false;
+                }
+                catch
+                {
+                    return false;
+                }
             }
         }
     }

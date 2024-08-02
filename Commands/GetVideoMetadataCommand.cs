@@ -4,6 +4,7 @@ using System.Windows;
 using ytdlpMA.ViewModels;
 using YoutubeExplode.Common;
 using System.Net.Http;
+using WebP.Net;
 
 namespace ytdlpMA.Commands
 {
@@ -30,14 +31,12 @@ namespace ytdlpMA.Commands
         {
             _videoViewModel.LoadingBarVisible = Visibility.Visible;
             _videoViewModel.ThumbnailOpacity = 0.5f;
-            string newId = Classes.Utilities.ExtractYouTubeVideoId(_videoViewModel.Url);
+            string newId = Utilities.Utilities.ExtractYouTubeVideoId(_videoViewModel.Url);
 
             var youtube = new YoutubeClient();
             try
             {
                 var video = await youtube.Videos.GetAsync(newId);
-                //_videoViewModel.Id = newId; 
-                // TODO: check if i need Id parameter
                 _videoViewModel.Title = video.Title;
                 _videoViewModel.Channel = video.Author.ChannelTitle;
                 if (video.Duration != null)
@@ -45,19 +44,18 @@ namespace ytdlpMA.Commands
                 else
                     _videoViewModel.Duration = TimeSpan.Zero;
 
+                byte[] thumbnailBytes = [];
+
+                using (HttpClient httpClient = new())
+                    thumbnailBytes = await httpClient.GetByteArrayAsync(video.Thumbnails.GetWithHighestResolution().Url);
+
                 if (video.Thumbnails.GetWithHighestResolution().Url.Contains("webp"))
                 {
-                    _videoViewModel.ErrorSnackbarMessageQueue.Enqueue(".webp thumbnails are not supported.");
-                    _videoViewModel.Thumbnail = Classes.Utilities.CreateBlankImage(4, 4);
+                    _videoViewModel.Thumbnail = Utilities.Utilities.ImageToBitmapImage(new WebPObject(thumbnailBytes).GetImage());
                 }
                 else
                 {
-                    byte[] thumbnailBytes = [];
-
-                    using (HttpClient httpClient = new())
-                        thumbnailBytes = await httpClient.GetByteArrayAsync(video.Thumbnails.GetWithHighestResolution().Url);
-
-                    _videoViewModel.Thumbnail = Classes.Utilities.ByteArrayToBitmapImage(thumbnailBytes);
+                    _videoViewModel.Thumbnail = Utilities.Utilities.ByteArrayToBitmapImage(thumbnailBytes);
                 }
 
                 _videoViewModel.QueuedUrl = _videoViewModel.Url;
@@ -67,7 +65,7 @@ namespace ytdlpMA.Commands
                 _videoViewModel.Title = "Title";
                 _videoViewModel.Channel = "Channel";
                 _videoViewModel.Duration = TimeSpan.Zero;
-                _videoViewModel.Thumbnail = Classes.Utilities.CreateBlankImage(4, 4);
+                _videoViewModel.Thumbnail = Utilities.Utilities.CreateBlankImage(4, 4);
                 _videoViewModel.ErrorSnackbarMessageQueue.Enqueue("Video not found.");
                 _videoViewModel.QueuedUrl = String.Empty;
             }

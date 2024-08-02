@@ -1,5 +1,5 @@
 ﻿// class definiton for video metadata and download options
-using ytdlpMA.Classes;
+using ytdlpMA.Utilities;
 using System.IO;
 using System.Windows.Media;
 
@@ -12,7 +12,6 @@ namespace ytdlpMA.Models
         // PARAMETERS
         public string Url { get; set; }
         public string QueuedUrl { get; set; }
-        public string Id { get; set; }
         public string Title { get; set; }
         public string Channel {  get; set; }
         public TimeSpan Duration { get; set; }
@@ -63,11 +62,10 @@ namespace ytdlpMA.Models
         {
             Url = string.Empty;
             QueuedUrl = string.Empty;
-            Id = string.Empty;
             Title = "Title";
             Channel = "Channel";
             Duration = TimeSpan.Zero;
-            Thumbnail = Classes.Utilities.CreateBlankImage(4, 4);
+            Thumbnail = Utilities.Utilities.CreateBlankImage(4, 4);
             FileDownloadPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             FileExtension = FileExtensionList[0];
             DownloadToggleOptions =

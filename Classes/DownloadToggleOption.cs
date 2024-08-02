@@ -1,4 +1,4 @@
-﻿namespace ytdlpMA.Classes
+﻿namespace ytdlpMA.Utilities
 {
     // class that hold information for the individual filter chips
     public class DownloadToggleOption(string option, string displayOption, bool value)

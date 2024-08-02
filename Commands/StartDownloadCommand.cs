@@ -1,20 +1,17 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using ytdlpMA.ViewModels;
 
 namespace ytdlpMA.Commands
 {
     class StartDownloadCommand : AsyncCommandBase
     {
-        // TODO: add stop button (kill process)
         private readonly VideoViewModel _videoViewModel;
-        public static readonly string ytdlp = @"Resources\exe\yt-dlp.exe";
         private bool _running = false;
 
         public override bool CanExecute(object? parameter)
         {
-            return _videoViewModel.QueuedUrl != String.Empty && _videoViewModel.FileDownloadPath != String.Empty && !_running && base.CanExecute(parameter);
+            return !String.IsNullOrEmpty(_videoViewModel.QueuedUrl) && _videoViewModel.FileDownloadPath != String.Empty && !_videoViewModel.HasErrors && !_running && base.CanExecute(parameter);
         }
 
         private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -34,7 +31,7 @@ namespace ytdlpMA.Commands
                 if (line.Data.StartsWith("[download]"))
                 {
                     _videoViewModel.DownloadProgressBarIndeterminate = false;
-                    _videoViewModel.DownloadProgressBarValue = Classes.Utilities.ParseDownloadProgress(line.Data);
+                    _videoViewModel.DownloadProgressBarValue = Utilities.Utilities.ParseDownloadProgress(line.Data);
                 }
                 else
                 {
@@ -55,7 +52,7 @@ namespace ytdlpMA.Commands
 
             ProcessStartInfo startInfo = new()
             {
-                FileName = Path.GetFullPath(ytdlp),
+                FileName = "yt-dlp",
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 WindowStyle = ProcessWindowStyle.Hidden,
@@ -67,11 +64,16 @@ namespace ytdlpMA.Commands
 
             _videoViewModel.ConsoleText = "yt-dlp " + String.Join(" ", _videoViewModel._video.BuildCommand()) + Environment.NewLine + Environment.NewLine;
 
+            if (!_videoViewModel._mainViewModel.IsFFmpegInstalled)
+                _videoViewModel.ConsoleText += ("[FFMPEG NOT FOUND. APP WILL HAVE LIMITED FUNCTIONALITY. PLEASE INSTALL FFMPEG VIA SETTINGS MENU]" + Environment.NewLine + Environment.NewLine);
+
             using (var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true })
             {
                 process.OutputDataReceived += new DataReceivedEventHandler(ProcessOutputHandler);
                 process.ErrorDataReceived += new DataReceivedEventHandler(ProcessOutputHandler);
                 process.Start();
+
+                _videoViewModel.ConsoleText += ("[PROCESS STARTED]" + Environment.NewLine);
 
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
@@ -81,15 +83,17 @@ namespace ytdlpMA.Commands
                 _videoViewModel.DownloadProgressBarValue = 0;
                 _videoViewModel.DownloadProgressBarIndeterminate = false;
 
-                _videoViewModel.ConsoleText += ("[PROCESS ENDED]" + Environment.NewLine);
+                _videoViewModel.ConsoleText += ("[PROCESS EXITED]" + Environment.NewLine);
+                if (!_videoViewModel._mainViewModel.IsFFmpegInstalled)
+                    _videoViewModel.ConsoleText += ("[FFMPEG NOT FOUND. APP WILL HAVE LIMITED FUNCTIONALITY. PLEASE INSTALL FFMPEG VIA SETTINGS MENU]" + Environment.NewLine);
 
                 if (process.ExitCode == 0)
                 {
-                    _videoViewModel.SuccessSnackbarMessageQueue.Enqueue("Process exited without errors.");
+                    _videoViewModel.SuccessSnackbarMessageQueue.Enqueue("Download completed successfully.");
                 }
                 else
                 {
-                    _videoViewModel.ErrorSnackbarMessageQueue.Enqueue("Process exited with errors.");
+                    _videoViewModel.ErrorSnackbarMessageQueue.Enqueue("Download failed. Check the console.");
                 }
 
                 _running = false;

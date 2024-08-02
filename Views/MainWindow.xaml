@@ -15,7 +15,6 @@
         Width="450"
         MinHeight="730"
         MinWidth="340"
-        MouseLeftButtonDown="Window_MouseLeftButtonDown"
         WindowStyle="None">
 
     <WindowChrome.WindowChrome>
@@ -24,7 +23,7 @@
                       CaptionHeight="0" />
     </WindowChrome.WindowChrome>
 
-    <materialDesign:DrawerHost x:Name="DrawerHost">
+    <materialDesign:DrawerHost x:Name="DrawerHost" IsRightDrawerOpen="False">
         <materialDesign:DrawerHost.RightDrawerContent>
             <Grid Margin="12">
                 <Grid.RowDefinitions>
@@ -32,12 +31,8 @@
                     <RowDefinition />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-
-                <!--<TextBlock Grid.Row="0"
-                           Text="Settings"
-                           Style="{StaticResource MaterialDesignHeadline5TextBlock}"
-                           Margin="0,0,0,12"/>-->
 
                 <materialDesign:PackIcon Grid.Row="0"
                                          HorizontalAlignment="Center"
@@ -46,7 +41,8 @@
                                          Height="24"
                                          Margin="0,0,0,12" />
 
-                <materialDesign:Card Grid.Row="1">
+                <materialDesign:Card Grid.Row="1"
+                                     Margin="0,0,0,12">
                     <Grid Margin="12,6"
                           Width="200">
                         <Grid.ColumnDefinitions>
@@ -94,9 +90,9 @@
                                  Grid.Column ="0"
                                  Grid.ColumnSpan="2"
                                  Margin="0,12,0,0"
-                                 materialDesign:HintAssist.Hint="Custom file name"
+                                 materialDesign:HintAssist.Hint="Custom output template"
                                  materialDesign:HintAssist.Background="{DynamicResource MaterialDesign.Brush.Card.Background}"
-                                 materialDesign:HintAssist.HelperText="Leave empty for default"
+                                 materialDesign:HintAssist.HelperText="Leave empty for a default value"
                                  Style="{StaticResource MaterialDesignOutlinedTextBox}"
                                  Text="{Binding Video.CustomFileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
@@ -104,35 +100,50 @@
                 </materialDesign:Card>
 
                 <materialDesign:Card Grid.Row="2"
-                                     Margin="0,12,0,0"
-                                     Height="100">
-                    <StackPanel VerticalAlignment="Center">
+                                     Margin="0,0,0,12" >
+                    <StackPanel VerticalAlignment="Center"
+                                Margin="12">
                         <TextBlock Text="FFmpeg available"
                                    HorizontalAlignment="Center"
                                    Style="{StaticResource MaterialDesignSubtitle2TextBlock}" />
 
-                        <Button x:Name="FFmpegCheckButton"
-                                Width="42"
+                        <Button Width="42"
                                 Height="42"
                                 Margin="0,12,0,0"
-                                Style="{StaticResource MaterialDesignFloatingActionLightButton}"
+                                Style="{StaticResource MaterialDesignFloatingActionLightButton}"                                
                                 materialDesign:ElevationAssist.Elevation="Dp0" 
-                                Background="#B00020"
+                                Background="{Binding IsFFmpegInstalled, Mode=OneWay, Converter={StaticResource FFmpegToBackgroundConverter}}"
                                 BorderThickness="0"
-                                BorderBrush="{x:Null}">
+                                BorderBrush="{x:Null}"
+                                Command="{Binding CheckFFmpeg}">
 
-                            <materialDesign:PackIcon Kind="Close"
+                            <materialDesign:PackIcon Kind="{Binding IsFFmpegInstalled, Mode=OneWay, Converter={StaticResource FFmpegToIconConverter}}"
                                                      Width="24"
                                                      Height="24"
-                                                     Foreground="White"/>
+                                                     ToolTip="Click to refresh FFmpeg availability"
+                                                     Foreground="White" VerticalAlignment="Center"/>
 
                         </Button>
                     </StackPanel>
                 </materialDesign:Card>
 
-                <TextBlock Grid.Row="3"
+                <materialDesign:Card Grid.Row="3"
+                                     Margin="0,0,0,12">
+                    
+                    <Button Margin="12"
+                            Style="{StaticResource MaterialDesignRaisedButton}"
+                            materialDesign:ButtonProgressAssist.IsIndeterminate="True"
+                            materialDesign:ButtonProgressAssist.IsIndicatorVisible="{Binding ShowFFmpegInstallButtonIndicator}"
+                            materialDesign:ButtonProgressAssist.Value="0"
+                            ToolTip="Downloads and install FFmpeg"
+                            Command="{Binding DownloadFFmpeg}"
+                            Content="{Binding FFmpegInstallStatusMessage}" />
+                    
+                </materialDesign:Card>
+                
+                <TextBlock Grid.Row="4"
                            HorizontalAlignment="Center"
-                           Margin="0,0,0,-8"
+                           Margin="0,0,0,0"
                            Style="{StaticResource MaterialDesignCaptionTextBlock}"
                            Opacity="0.25"
                            Text="yt-dlp-MA 2.0" />
@@ -152,7 +163,8 @@
                 </Grid.RowDefinitions>
 
                 <Border Grid.Row="0"
-                        Background="Transparent">
+                        Background="Transparent"
+                        MouseLeftButtonDown="Window_MouseLeftButtonDown">
                     <Grid Margin="0,-6,0,6">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
@@ -175,8 +187,10 @@
                                     Style="{StaticResource MaterialDesignIconButton}"
                                     Width="36"
                                     Height="36"
+                                    ToolTip="Settings"
                                     Content="{materialDesign:PackIcon Cog}"
-                                    Click="ToggleDrawer_Click" />
+                                    Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}"
+                                    CommandParameter="{x:Static Dock.Right}" />
 
                             <Button x:Name="CloseButton"
                                     Style="{StaticResource MaterialDesignIconButton}"
@@ -223,7 +237,8 @@
                                         VerticalAlignment="Top"
                                         Style="{StaticResource MaterialDesignIconForegroundButton}"
                                         Margin="6,0,0,0"
-                                        Content="{materialDesign:PackIcon Reload}"
+                                        ToolTip="Fetch video details"
+                                        Content="{materialDesign:PackIcon ProgressDownload}"
                                         Command="{Binding Video.GetVideoMetadata}"/>
                             </Grid>
 
@@ -317,6 +332,7 @@
                                         Height="40"
                                         Margin="6,0"
                                         HorizontalAlignment="Right"
+                                        ToolTip="Select download location"
                                         Style="{StaticResource MaterialDesignIconForegroundButton}"
                                         Content="{materialDesign:PackIcon Kind=Folder}"
                                         Command="{Binding Video.SetDownloadPath}" />
@@ -328,8 +344,7 @@
                                           Margin="6,0,0,0"
                                           SelectedIndex="0"
                                           ItemsSource="{Binding Video.FileExtensionList}"
-                                          SelectedItem="{Binding Video.FileExtension}"
-                                          IsEnabled="{Binding [0]}" />
+                                          SelectedItem="{Binding Video.FileExtension}" />
                             </Grid>
 
                             <TextBox x:Name="CustomArgumentsTextBox"
@@ -344,13 +359,13 @@
                                      Grid.Row="2"
                                      Padding="0"
                                      Margin="0,6,0,0"
-                                     ItemsSource="{Binding Video.DownloadToggleOptions}">
+                                     ItemsSource="{Binding Video.DownloadToggleOptions, Mode=OneWay}">
 
                                 <ListBox.ItemContainerStyle>
                                     <Style TargetType="{x:Type ListBoxItem}"
                                            BasedOn="{StaticResource MaterialDesignFilterChipOutlineListBoxItem}">
                                         <Setter Property="IsSelected"
-                                                Value="{Binding Value, Mode=TwoWay}" />
+                                                Value="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                     </Style>
                                 </ListBox.ItemContainerStyle>
 
@@ -387,7 +402,7 @@
                                      BorderBrush="Transparent"
                                      Background="Black"
                                      Foreground="White"
-                                     FontFamily="Roboto Mono"
+                                     FontFamily="Consolas"
                                      FontWeight="Regular"
                                      Text="{Binding Video.ConsoleText, UpdateSourceTrigger=PropertyChanged}"
                                      Visibility="{Binding ShowConsole, Converter={StaticResource BooleanToVisibilityConverter}}"
@@ -409,12 +424,14 @@
                                 <Button Style="{StaticResource MaterialDesignIconButton}"
                                         Height="32"
                                         Width="32"
+                                        ToolTip="Open download location"
                                         Content="{materialDesign:PackIcon FolderOpen, 18}"
                                         Command="{Binding Video.OpenDownloadPath}" />
 
                                 <Button Style="{StaticResource MaterialDesignRaisedButton}"
                                         Margin="12,6,0,6"
                                         Content="DOWNLOAD"
+                                        ToolTip="Download"
                                         Command="{Binding Video.StartDownload}" />
                             </StackPanel>
                         </Grid>
@@ -425,7 +442,7 @@
                                          Grid.Row="3"
                                          Margin="0 0 0 -12"
                                          Panel.ZIndex="0"
-                                         MessageQueue="{Binding Video.ErrorSnackbarMessageQueue}"
+                                         MessageQueue="{Binding ErrorSnackbarMessageQueue}"
                                          IsActive="False"
                                          Background="DarkRed"
                                          Foreground="White" />
@@ -434,7 +451,7 @@
                          Grid.Row="3"
                          Margin="0 0 0 -12"
                          Panel.ZIndex="0"
-                         MessageQueue="{Binding Video.SuccessSnackbarMessageQueue}"
+                         MessageQueue="{Binding SuccessSnackbarMessageQueue}"
                          IsActive="False"
                          Background="Green"
                          Foreground="White" />
